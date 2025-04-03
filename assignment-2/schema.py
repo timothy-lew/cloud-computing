@@ -1,7 +1,8 @@
 class Summary:
     def __init__(self):
         self.type = "string"
-        self.description = "A summary of the relevance and usage of the files."
+        # self.description = "A summary of the relevance and usage of the files."
+        self.description = "A summary of the query word."
 
     def to_dict(self):
         return {
@@ -18,7 +19,8 @@ class File:
             "description": {"type": "string"},
             "file_path": {"type": "string"},
             "score": {"type": "number"},
-            "html_url": {"type": "string"}
+            "html_url": {"type": "string"},
+            "file_summary": {"type": "string", "description": "A summary of this specific file's relevance and usage"}
         }
 
     def to_dict(self):

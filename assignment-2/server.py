@@ -54,7 +54,7 @@ async def github(query: str):
 
 @app.get("/github/code", status_code=HTTPStatus.OK)
 async def github(query: str):
-    url = f"https://api.github.com/search/code?q={query}&page=2&per_page=2&sort=score&order=desc"
+    url = f"https://api.github.com/search/code?q={query}&page=2&per_page=5&sort=score&order=desc"
     headers = {
         "Authorization": f"Bearer {GITHUB_HEADER_TOKEN}"
     }
@@ -68,13 +68,15 @@ async def github(query: str):
         # return response.json()
     
     items = response.json().get("items", [])
+    # print(items)
     # return items
     # return response.json()
 
-    message_content = "Here are some files from the GitHub search for 'blockchain':\n"
+    message_content = f"Here are some files from the GitHub search API for the query: '{query}':\n"
         
     for item in items:
-        message_content += f"\nFile Name: {item['name']}\n"
+        message_content += f"---\n"
+        message_content += f"File Name: {item['name']}\n"
         message_content += f"Repository: {item['repository']['full_name']}\n"
         message_content += f"Description: {item['repository'].get('description', 'No description available')}\n"
         message_content += f"File Path: {item['path']}\n"
@@ -97,23 +99,6 @@ async def github(query: str):
     print(completion)
     res = json.loads(completion.choices[0].message.content)
     return res    
-
-@app.post("/llm")
-def generate(
-):
-    try:
-        completion = client.chat.completions.create(
-            model=MODEL,
-            messages=[
-                {
-                    "role": "user",
-                    "content": "Write a one-sentence bedtime story about a unicorn."
-                }
-            ],
-        )
-        return {"response": completion.choices[0].message.content}
-    except Exception as e:
-        raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR, detail=str(e))
 
 if __name__ == "__main__":
     uvicorn.run('server:app',  host="0.0.0.0", reload=True)
