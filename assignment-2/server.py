@@ -38,7 +38,7 @@ def pong():
 
 @app.get("/github/repo", status_code=HTTPStatus.OK)
 async def github(query: str):
-    url = f"https://api.github.com/search/repositories?q={query}&page=5&per_page=5&sort=score&order=desc"
+    url = f"https://api.github.com/search/repositories?q={query}&page=5&per_page=3&sort=score&order=desc"
     headers = {
         "Authorization": f"Bearer {GITHUB_HEADER_TOKEN}"
     }
@@ -79,7 +79,7 @@ async def github(query: str):
 
 @app.get("/github/code", status_code=HTTPStatus.OK)
 async def github(query: str):
-    url = f"https://api.github.com/search/code?q={query}&page=2&per_page=5&sort=score&order=desc"
+    url = f"https://api.github.com/search/code?q={query}&page=2&per_page=3&sort=score&order=desc"
     headers = {
         "Authorization": f"Bearer {GITHUB_HEADER_TOKEN}"
     }
