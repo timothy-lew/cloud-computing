@@ -9,7 +9,8 @@ from pathlib import Path
 from typing import Any 
 from dotenv import load_dotenv
 from openai import OpenAI
-from schema import GitHubCodeSummary, response_format
+from code_schema import response_format as code_response_format
+from repo_schema import response_format as repo_response_format
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -37,20 +38,44 @@ def pong():
 
 @app.get("/github/repo", status_code=HTTPStatus.OK)
 async def github(query: str):
-    url = f"https://api.github.com/search/repositories?q={query}&page=5&sort=score&order=desc"
+    url = f"https://api.github.com/search/repositories?q={query}&page=5&per_page=5&sort=score&order=desc"
     headers = {
         "Authorization": f"Bearer {GITHUB_HEADER_TOKEN}"
     }
     
     # Make the GET request asynchronously
-    async with httpx.AsyncClient() as client:
-        response = await client.get(url, headers=headers)
+    async with httpx.AsyncClient() as client2:
+        response = await client2.get(url, headers=headers)
         if response.json().get("total_count", 0) == 0:
             raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="No items found")
     
     items = response.json().get("items", [])
-    
-    return items
+    message_content = f"Here are some repositories from the GitHub repository API for the query: '{query}':\n"
+        
+    for item in items:
+        message_content += f"---\n"
+        message_content += f"Repository Name: {item['name']}\n"
+        message_content += f"Repository Full Name: {item['full_name']}\n"
+        message_content += f"Description: {item.get('description', 'No description available')}\n"
+        message_content += f"Score: {item['score']}\n"
+        message_content += f"HTML URL: {item['html_url']}\n"
+        message_content += f"---\n"
+    print("message_content", message_content)
+
+    completion = client.chat.completions.create(
+            model=MODEL,
+            messages=[
+                {
+                    "role": "user",
+                    "instructions": "You are an intelligent assistant that helps users understand code repositories.",
+                    "content": f"{message_content}Please summarize the relevance and usage of these code repositories.",
+                }
+            ],
+            response_format=repo_response_format,
+        )
+    print(completion)
+    res = json.loads(completion.choices[0].message.content)
+    return res 
 
 @app.get("/github/code", status_code=HTTPStatus.OK)
 async def github(query: str):
@@ -94,7 +119,7 @@ async def github(query: str):
                     "content": f"{message_content}Please summarize the relevance and usage of these files.",
                 }
             ],
-            response_format=response_format,
+            response_format=code_response_format,
         )
     print(completion)
     res = json.loads(completion.choices[0].message.content)
