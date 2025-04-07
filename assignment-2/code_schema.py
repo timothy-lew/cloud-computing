@@ -20,7 +20,8 @@ class File:
             "file_path": {"type": "string"},
             "score": {"type": "number"},
             "html_url": {"type": "string"},
-            "file_summary": {"type": "string", "description": "A summary of this specific file's relevance and usage"}
+            "file_summary": {"type": "string", "description": "A summary of this specific file's relevance and usage"},
+            "file_content": {"type": "string", "description": "The content of the file"}
         }
 
     def to_dict(self):

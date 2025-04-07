@@ -1,6 +1,24 @@
 // src/components/FileDetails.jsx
+import { useState } from 'react';
+
 const FileDetails = ({ file }) => {
+  const [showFullCode, setShowFullCode] = useState(false);
+  
   if (!file) return null;
+  
+  // Function to determine if code should be truncated
+  const isCodeLong = file.file_content && file.file_content.split('\n').length > 15;
+  
+  // Get displayable code (either truncated or full based on state)
+  const displayCode = () => {
+    if (!file.file_content) return "No content available";
+    
+    if (isCodeLong && !showFullCode) {
+      return file.file_content.split('\n').slice(0, 15).join('\n') + '\n...';
+    }
+    
+    return file.file_content;
+  };
   
   return (
     <div className="border rounded-lg p-6">
@@ -37,10 +55,31 @@ const FileDetails = ({ file }) => {
         <p className="text-gray-700">{file.description}</p>
       </div>
       
-      <div>
+      <div className="mb-6">
         <h3 className="text-sm font-medium text-gray-500 mb-2">Summary</h3>
         <div className="bg-gray-50 p-4 rounded-lg">
           <p className="text-gray-700">{file.file_summary}</p>
+        </div>
+      </div>
+      
+      {/* Code Viewer Section */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-sm font-medium text-gray-500">File Content</h3>
+          {isCodeLong && (
+            <button 
+              onClick={() => setShowFullCode(!showFullCode)}
+              className="text-xs text-blue-600 hover:text-blue-800"
+            >
+              {showFullCode ? 'Show Less' : 'Show Full Code'}
+            </button>
+          )}
+        </div>
+        
+        <div className="bg-gray-900 text-gray-200 p-4 rounded-lg overflow-x-auto">
+          <pre className="whitespace-pre-wrap font-mono text-sm">
+            {displayCode()}
+          </pre>
         </div>
       </div>
     </div>

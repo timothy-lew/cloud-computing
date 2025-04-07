@@ -96,7 +96,7 @@ function App() {
         <div className="space-y-8">
           <div className="bg-blue-50 p-6 rounded-lg">
             <h2 className="text-2xl font-bold mb-2">Overall Summary</h2>
-            <p>{codeResults.overall_summary}</p>
+            <p>{codeResults.summary}</p>
           </div>
           
           <FileList files={codeResults.files} />
